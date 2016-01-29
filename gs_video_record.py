@@ -1,7 +1,7 @@
 import numpy as np
 import cv2
 
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(1)
 
 # Define the codec and create VideoWriter object
 # fourcc = cv2.VideoWriter_fourcc(*'XVID')
@@ -31,7 +31,7 @@ while cap.isOpened():
             # print("DiffFrame Size:" + str(diffFrame.size))
 
         if diffFrame is not None:
-            # mark faces in diffFrame
+            # mark faces in diffFrameq
             for (x, y, w, h) in faces:
                 diffFrame = cv2.rectangle(diffFrame, (x, y), (x + w, y + h), (255, 0, 0), 2)
                 roi_color = diffFrame[y:y + h, x:x + w]
