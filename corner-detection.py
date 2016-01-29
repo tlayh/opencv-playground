@@ -2,8 +2,8 @@ import cv2
 import numpy as np
 from matplotlib import pyplot as plt
 
-img = cv2.imread('thats-me.jpg', 0)
-# img = cv2.imread('opencv-logo-white.png')
+img = cv2.imread('data/testimages/thats-me.jpg', 0)
+# img = cv2.imread('data/testimages/opencv-logo-white.png')
 
 laplacian = cv2.Laplacian(img, cv2.CV_64F)
 sobelx = cv2.Sobel(img, cv2.CV_64F, 1, 0, ksize=5)

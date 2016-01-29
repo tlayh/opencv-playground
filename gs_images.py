@@ -3,8 +3,8 @@ import cv2
 from matplotlib import pyplot as plt
 
 # Load an color image in grayscale
-img = cv2.imread('thats-me.jpg', 0)
-logo = cv2.imread('roi.jpg', 0)
+img = cv2.imread('data/testimages/thats-me.jpg', 0)
+logo = cv2.imread('data/testimages/roi.jpg', 0)
 
 print("shape")
 print(img.shape)
