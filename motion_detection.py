@@ -5,6 +5,14 @@ import imutils
 import time
 import cv2
 
+#
+# ToDo:
+# - Reset default frame after some time
+# - Don't take to much images if motion is detected
+# - Record video if motion is detected?
+#
+
+
 # construct the argument parser and parse the arguments
 ap = argparse.ArgumentParser()
 ap.add_argument("-v", "--video", help="path to the video file")
@@ -14,7 +22,7 @@ args = vars(ap.parse_args())
 # if the video argument is None, then we are reading from webcam
 if args.get("video", None) is None:
     camera = cv2.VideoCapture(1)
-    time.sleep(0.25)
+    time.sleep(.25)
 
 # otherwise, we are reading from a video file
 else:
@@ -22,13 +30,17 @@ else:
 
 # initialize the first frame in the video stream
 firstFrame = None
+imageCounter = 0
 
 # loop over the frames of the video
 while True:
+    # count checked images
+    imageCounter += 1
+
     # grab the current frame and initialize the occupied/unoccupied
     # text
     (grabbed, frame) = camera.read()
-    text = "Unoccupied"
+    text = "Empty"
 
     # if the frame could not be grabbed, then we have reached the end
     # of the video
@@ -41,8 +53,11 @@ while True:
     gray = cv2.GaussianBlur(gray, (21, 21), 0)
 
     # if the first frame is None, initialize it
-    if firstFrame is None:
+    # reset after 1000 images
+    if firstFrame is None or imageCounter > 30:
         firstFrame = gray
+        imageCounter = 0
+        print("firstFrame set/reset")
         continue
 
     # compute the absolute difference between the current frame and
@@ -65,19 +80,25 @@ while True:
         # and update the text
         (x, y, w, h) = cv2.boundingRect(c)
         cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
-        text = "Occupied"
+        text = "Someone"
+        filename = "data/images/" + datetime.datetime.now().strftime("%A %d %B %Y %I:%M:%S%p") + ".jpg"
+        cv2.imwrite(filename, frame)
+        print("Motion detection file written.")
 
     # draw the text and timestamp on the frame
-    cv2.putText(frame, "Room Status: {}".format(text), (10, 20),
+    cv2.putText(frame, "Detection Status: {}".format(text), (10, 20),
                 cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
     cv2.putText(frame, datetime.datetime.now().strftime("%A %d %B %Y %I:%M:%S%p"),
                 (10, frame.shape[0] - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.35, (0, 0, 255), 1)
 
     # show the frame and record if the user presses a key
-    cv2.imshow("Security Feed", frame)
-    cv2.imshow("Thresh", thresh)
-    cv2.imshow("Frame Delta", frameDelta)
+    # cv2.imshow("Security Feed", frame)
+    # cv2.imshow("Thresh", thresh)
+    # cv2.imshow("Frame Delta", frameDelta)
     key = cv2.waitKey(1) & 0xFF
+
+    # wait for a short time to make less images
+    time.sleep(.25)
 
     # if the `q` key is pressed, break from the lop
     if key == ord("q"):
